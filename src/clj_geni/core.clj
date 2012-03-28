@@ -1,34 +1,46 @@
 (ns clj-geni.core
+  (:refer-clojure :exclude [read parse])
   (:require [clj-http.client :as http]
             [clojure.string :as string]
             [cheshire.core :as json]))
 
-(def base "https://www.geni.com/api/")
+(def ^:private base "https://www.geni.com/api")
 
-(defn parse [res]
+(defn ^:private parse [res]
   (json/parse-string (:body res) true))
 
-(defn json-date [options]
-  (if-let [date (:date options)]
-    (assoc options :date (string/join "-" ((juxt :day :month :year) date)))
-    options))
+(defn ^:private join-seqs
+  "Join any values in the map that are seqs with commas."
+  [m]
+  (into {}
+        (for [[k v] m]
+          [k (if (coll? v)
+               (string/join "," v)
+               v)])))
 
-(defn join-key [options key]
-  (if-let [item (options key)]
-    (assoc options key (string/join "," item))
-    options))
+(defn api
+  ([url] (api url {} :get))
+  ([url params] (api url params :get))
+  ([url params method]
+   (parse
+     (http/request
+       (merge
+         {:method method
+          :url (str base url)}
+         (let [params (-> params
+                          (assoc :access_token (:token params))
+                          (dissoc :token)
+                          join-seqs)]
+           (if (= :post method)
+             {:form-params params}
+             {:query-params params})))))))
 
-(defn req [method url required optional]
-  (parse
-    (http/request
-      (merge
-        {:throw-exceptions false
-         :method method
-         :url (doto (str base (apply format url required)) prn)}
-        {(if (#{:put :post :delete} method)
-           :form-params
-           :query-params) (assoc optional :access_token (:token optional))}))))
+(defn read
+  ([url] (read url {}))
+  ([url params]
+   (api url params)))
 
-(defn document [document & [options]]
-  (req :get (str "document-%s") [document] options))
-
+(defn write
+  ([url] (write url {}))
+  ([url params]
+   (api url params :post)))

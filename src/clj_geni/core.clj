@@ -19,14 +19,22 @@
                v)])))
 
 (defn api
-  ([url] (api url {} :get))
-  ([url params] (api url params :get))
-  ([url params method]
+  "Calls the Geni API. Expects at least a a path, which is
+  an API endpoint. For example, /profiles-101. If the API call
+  requires parameters, they are passed as a map as the second
+  argument. The final param, method, is either :get or :post.
+  It defaults to :get, but you'll need to set :post for write
+  methods.
+
+  See the `read` and `write` functions for convenience."
+  ([path] (api path {} :get))
+  ([path params] (api path params :get))
+  ([path params method]
    (parse
      (http/request
        (merge
          {:method method
-          :url (str base url)}
+          :url (str base path)}
          (let [params (-> params
                           (assoc :access_token (:token params))
                           (dissoc :token)
@@ -36,11 +44,13 @@
              {:query-params params})))))))
 
 (defn read
-  ([url] (read url {}))
-  ([url params]
-   (api url params)))
+  "Read from the Geni API with a GET request. See `api`."
+  ([path] (read path {}))
+  ([path params]
+   (api path params)))
 
 (defn write
-  ([url] (write url {}))
-  ([url params]
-   (api url params :post)))
+  "Write to the Geni API with a POST request. See `api`."
+  ([path] (write path {}))
+  ([path params]
+   (api path params :post)))

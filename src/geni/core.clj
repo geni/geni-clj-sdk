@@ -1,4 +1,4 @@
-(ns clj-geni.core
+(ns geni.core
   (:refer-clojure :exclude [read parse])
   (:require [clj-http.client :as http]
             [clojure.string :as string]

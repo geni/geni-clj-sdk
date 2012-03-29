@@ -1,4 +1,4 @@
-# clj-geni
+# clj-geni-sdk
 
 A simple Clojure client for the [Geni](http://geni.com) API.
 
@@ -9,15 +9,15 @@ one function: `api` for reading and writing via the API. Here is how we
 use the API's write methods:
 
 ```clojure
-user=> (require 'clj-geni.core)
+user=> (require 'geni.core)
 nil
 user=> (def token "youroauthaccesstoken")
 #'user/token
-user=> (clj-geni.core/api "/document/add" {:text "foo bar baz", :title "baz bar foo", :labels ["foo" "bar" "baz"] :description "A foo of the bar and the baz." :date "03-12-1733" :token token} :post)
+user=> (geni.core/api "/document/add" {:text "foo bar baz", :title "baz bar foo", :labels ["foo" "bar" "baz"] :description "A foo of the bar and the baz." :date "03-12-1733" :token token} :post)
 
 {:labels ["baz" "bar" "foo"], :content_type "text/plain", :date {:day 12, :month 3, :year 1733}, :sizes {:original "/images/documents/doc.png", :large "/images/documents/doc.png", :url "https://www.geni.com/api/document-747358", :thumb "/images/documents/doc.png"}, :updated_at "1332972988", :guid "6000000016025259023", :title "baz bar foo", :created_at "1332972988", :url "https://www.geni.com/api/document-747358", :id "document-747358", :description "A foo of the bar and the baz."}
 
-user=> (clj-geni.core/write "/document/add" {:text "foo bar baz", :title "baz bar foo", :labels ["foo" "bar" "baz"] :description "A foo of the bar and the baz." :date "03-12-1733" :token token})
+user=> (geni.core/write "/document/add" {:text "foo bar baz", :title "baz bar foo", :labels ["foo" "bar" "baz"] :description "A foo of the bar and the baz." :date "03-12-1733" :token token})
 
 {:labels ["baz" "bar" "foo"], :content_type "text/plain", :date {:day 12, :month 3, :year 1733}, :sizes {:url "https://www.geni.com/api/document-747360", :large "/images/documents/doc.png", :thumb "/images/documents/doc.png", :original "/images/documents/doc.png"}, :updated_at "1332973005", :guid "6000000016025118014", :title "baz bar foo", :created_at "1332973005", :url "https://www.geni.com/api/document-747360", :id "document-747360", :description "A foo of the bar and the baz."}
 ```
@@ -29,7 +29,8 @@ GET request.
 
 Let's note a few things:
 
-* For the `:labels` parameter, we passed a vector of strings. clj-geni
+* For the `:labels` parameter, we passed a vector of strings.
+  clj-geni-sdk
   will convert this to a string of comma-separated values. For example,
   in this case, the `labels` param will be set to `foo,bar,baz`.
 * We passed a token key with our token. This will be passed to the Geni
@@ -39,9 +40,9 @@ Let's note a few things:
 Here are some example reads:
 
 ```clojure
-user=> (clj-geni.core/read "/profile-101" {:token token})
+user=> (geni.core/read "/profile-101" {:token token})
 {:public false, :name "Amos Elliston", :id "profile-101", :guid "1"}
-user=> (clj-geni.core/read "/profile-101" {:fields ["name" "public"] :token token})
+user=> (geni.core/read "/profile-101" {:fields ["name" "public"] :token token})
 {:public false, :name "Amos Elliston"}
 ```
 

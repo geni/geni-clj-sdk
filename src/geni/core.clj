@@ -4,7 +4,7 @@
             [clojure.string :as string]
             [cheshire.core :as json]))
 
-(def ^:private ^:dynamic *base* "https://www.geni.com/api")
+(def ^:dynamic *base* "https://www.geni.com/api")
 
 (defn ^:private parse [res]
   (json/parse-string (:body res) true))

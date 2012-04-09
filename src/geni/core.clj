@@ -4,7 +4,7 @@
             [clojure.string :as string]
             [cheshire.core :as json]))
 
-(def ^:private base "https://www.geni.com/api")
+(def ^:private ^:dynamic *base* "https://www.geni.com/api")
 
 (defn ^:private parse [res]
   (json/parse-string (:body res) true))
@@ -34,7 +34,7 @@
      (http/request
        (merge
          {:method method
-          :url (str base path)}
+          :url (str *base* path)}
          (let [params (-> params
                           (assoc :access_token (:token params))
                           (dissoc :token)

@@ -34,14 +34,16 @@
      (http/request
        (merge
          {:method method
-          :url (str *base* path)}
+          :url (str *base* path)
+          :insecure? (:insecure? params)}
          (let [params (-> params
                           (assoc :access_token (:token params))
-                          (dissoc :token)
-                          join-seqs)]
+                          (dissoc :token :insecure?))]
            (if (= :post method)
-             {:form-params params}
-             {:query-params params})))))))
+             {:body (json/generate-string (dissoc params :access_token))
+              :query-params {:access_token (:access_token params)}
+              :headers {"Content-Type" "application/json"}}
+             {:query-params (join-seqs params)})))))))
 
 (defn read
   "Read from the Geni API with a GET request. See `api`."

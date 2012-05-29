@@ -5,6 +5,7 @@
             [cheshire.core :as json]))
 
 (def ^:dynamic *base* "https://www.geni.com/api")
+(def ^:dynamic *insecure* false)
 
 (defn ^:private parse [res]
   (json/parse-string (:body res) true))
@@ -20,7 +21,7 @@
 
 (defn api
   "Calls the Geni API. Expects at least a a path, which is
-  an API endpoint. For example, /profiles-101. If the API call
+  an API endpoint. For example, /profile-101. If the API call
   requires parameters, they are passed as a map as the second
   argument. The final param, method, is either :get or :post.
   It defaults to :get, but you'll need to set :post for write
@@ -32,18 +33,19 @@
   ([path params method]
    (parse
      (http/request
-       (merge
-         {:method method
-          :url (str *base* path)
-          :insecure? (:insecure? params)}
-         (let [params (-> params
-                          (assoc :access_token (:token params))
-                          (dissoc :token :insecure?))]
-           (if (= :post method)
-             {:body (json/generate-string (dissoc params :access_token))
-              :query-params {:access_token (:access_token params)}
-              :headers {"Content-Type" "application/json"}}
-             {:query-params (join-seqs params)})))))))
+      (merge
+       {:method method
+        :throw-exceptions false
+        :url (str *base* path)
+        :insecure? *insecure*}
+       (let [params (-> params
+                        (assoc :access_token (:token params))
+                        (dissoc :token :insecure?))]
+         (if (= :post method)
+           {:body (json/generate-string (dissoc params :access_token))
+            :query-params {:access_token (:access_token params)}
+            :headers {"Content-Type" "application/json"}}
+           {:query-params (join-seqs params)})))))))
 
 (defn read
   "Read from the Geni API with a GET request. See `api`."

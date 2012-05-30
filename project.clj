@@ -1,4 +1,4 @@
-(defproject geni-clj-sdk "0.1.4-alpha1"
+(defproject geni-clj-sdk "0.1.4-alpha2"
   :description "A Clojure API wrapper around the Geni API."
   :url "https://github.com/flatland/clj-geni"
   :dependencies [[org.clojure/clojure "1.3.0"]

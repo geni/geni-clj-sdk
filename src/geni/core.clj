@@ -50,7 +50,7 @@
   "Read from the Geni API with a GET request. See `api`."
   ([path] (read path {}))
   ([path params]
-     (api :get path params)))
+     (api :get path {} params)))
 
 (defn write
   "Write to the Geni API with a POST request. See `api`."

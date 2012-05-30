@@ -6,6 +6,7 @@
 
 (def ^:dynamic *base* "https://www.geni.com/api")
 (def ^:dynamic *insecure* false)
+(def ^:dynamic *access-token* nil)
 
 (defn ^:private parse [res]
   (json/parse-string (:body res) true))
@@ -28,9 +29,8 @@
   methods.
 
   See the `read` and `write` functions for convenience."
-  ([path] (api path {} :get))
-  ([path params] (api path params :get))
-  ([path params method]
+  ([path method params] (api method path {} params))
+  ([path method data params]
    (parse
      (http/request
       (merge
@@ -38,12 +38,11 @@
         :throw-exceptions false
         :url (str *base* path)
         :insecure? *insecure*}
-       (let [params (-> params
-                        (assoc :access_token (:token params))
-                        (dissoc :token :insecure?))]
+       (let [params (merge {:access_token *access-token*}
+                           params)]
          (if (= :post method)
-           {:body (json/generate-string (dissoc params :access_token))
-            :query-params {:access_token (:access_token params)}
+           {:body (json/generate-string data)
+            :query-params params
             :headers {"Content-Type" "application/json"}}
            {:query-params (join-seqs params)})))))))
 
@@ -51,10 +50,10 @@
   "Read from the Geni API with a GET request. See `api`."
   ([path] (read path {}))
   ([path params]
-   (api path params)))
+   (api :get path params)))
 
 (defn write
   "Write to the Geni API with a POST request. See `api`."
-  ([path] (write path {}))
-  ([path params]
-   (api path params :post)))
+  ([path data] (write path data {}))
+  ([path data params]
+     (api :post path data params)))

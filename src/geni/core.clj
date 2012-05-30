@@ -9,7 +9,7 @@
 (def ^:dynamic *access-token* nil)
 
 (defn ^:private parse [res]
-  (json/parse-string (:body res) true))
+  (json/parse-string (:body res)))
 
 (defn ^:private join-seqs
   "Join any values in the map that are seqs with commas."
@@ -31,20 +31,20 @@
   See the `read` and `write` functions for convenience."
   ([method path params] (api method path {} params))
   ([method path data params]
-   (parse
-     (http/request
-      (merge
-       {:method method
-        :throw-exceptions false
-        :url (str *base* path)
-        :insecure? *insecure*}
-       (let [params (merge {:access_token *access-token*}
-                           params)]
-         (if (= :post method)
-           {:body (json/generate-string data)
-            :query-params params
-            :headers {"Content-Type" "application/json"}}
-           {:query-params (join-seqs params)})))))))
+     (parse
+      (http/request
+       (merge
+        {:method method
+         :throw-exceptions false
+         :url (str *base* path)
+         :insecure? *insecure*}
+        (let [params (merge {:access_token *access-token*}
+                            params)]
+          (if (= :post method)
+            {:body (json/generate-string data)
+             :query-params params
+             :headers {"Content-Type" "application/json"}}
+            {:query-params (join-seqs params)})))))))
 
 (defn read
   "Read from the Geni API with a GET request. See `api`."

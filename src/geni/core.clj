@@ -29,8 +29,8 @@
   methods.
 
   See the `read` and `write` functions for convenience."
-  ([path method params] (api method path {} params))
-  ([path method data params]
+  ([method path params] (api method path {} params))
+  ([method path data params]
    (parse
      (http/request
       (merge
@@ -50,7 +50,7 @@
   "Read from the Geni API with a GET request. See `api`."
   ([path] (read path {}))
   ([path params]
-   (api :get path params)))
+     (api :get path params)))
 
 (defn write
   "Write to the Geni API with a POST request. See `api`."

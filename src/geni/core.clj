@@ -7,6 +7,7 @@
 (def ^:dynamic *base* "https://www.geni.com/api")
 (def ^:dynamic *insecure* false)
 (def ^:dynamic *access-token* nil)
+(def ^:dynamic *basic-auth* nil)
 
 (defn ^:private parse [res]
   (json/parse-string (:body res)))
@@ -35,6 +36,7 @@
       (http/request
        (merge
         {:method method
+         :basic-auth *basic-auth*
          :throw-exceptions false
          :url (str *base* path)
          :insecure? *insecure*}
